@@ -20,12 +20,14 @@ export class AuthService {
   // Create a stream of logged in status to communicate throughout app
   loggedIn: boolean;
   loggedIn$ = new BehaviorSubject<boolean>(this.loggedIn);
+  isAdmin: boolean;
 
   constructor(private router: Router) {
     // If authenticated, set local profile property
     // and update login status subject.
     // If not authenticated but there are still items
     // in localStorage, log out.
+
     const lsProfile = localStorage.getItem('profile');
 
     if (this.tokenValid) {
@@ -33,6 +35,11 @@ export class AuthService {
       this.setLoggedIn(true);
     } else if (!this.tokenValid && lsProfile) {
       this.logout();
+    }
+    if (this.tokenValid) {
+      this.userProfile = JSON.parse(localStorage.getItem('profile'));
+      this.isAdmin = localStorage.getItem('isAdmin') === 'true';
+      this.setLoggedIn(true);
     }
   }
 
@@ -79,8 +86,14 @@ export class AuthService {
     localStorage.setItem('expires_at', expiresAt);
     localStorage.setItem('profile', JSON.stringify(profile));
     this.userProfile = profile;
-    // Update login status in loggedIn$ stream
+    this.isAdmin = this._checkAdmin(profile);
+    localStorage.setItem('isAdmin', this.isAdmin.toString());
     this.setLoggedIn(true);
+  }
+  private _checkAdmin(profile) {
+    // Check if the user has admin role
+    const roles = profile[AUTH_CONFIG.NAMESPACE] || [];
+    return roles.indexOf('admin') > -1;
   }
 
   logout() {
@@ -91,6 +104,9 @@ export class AuthService {
     localStorage.removeItem('authRedirect');
     // Reset local properties, update loggedIn$ stream
     this.userProfile = undefined;
+    localStorage.removeItem('isAdmin');
+    this.isAdmin = undefined;
+    this.setLoggedIn(false);
     this.setLoggedIn(false);
     // Return to homepage
     this.router.navigate(['/']);

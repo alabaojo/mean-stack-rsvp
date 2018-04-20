@@ -6,6 +6,7 @@ interface AuthConfig {
   AUDIENCE: string;
   REDIRECT: string;
   SCOPE: string;
+  NAMESPACE: string;
 }
 
 export const AUTH_CONFIG: AuthConfig = {
@@ -14,5 +15,6 @@ export const AUTH_CONFIG: AuthConfig = {
   // AUDIENCE: 'http://localhost.com:8083/api/',  // e.g., http://localhost:8083/api/
   AUDIENCE: 'https://alabaojo.eu.auth0.com/api/v2/',
   REDIRECT: `${ENV.BASE_URI}/callback`,
-  SCOPE: 'openid profile'
+  SCOPE: 'openid profile',
+  NAMESPACE: 'http://myapp.com/roles',
 };
