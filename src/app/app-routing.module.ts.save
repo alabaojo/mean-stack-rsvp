@@ -9,11 +9,8 @@ const routes: Routes = [
   {
     path: '',
     component: HomeComponent
-  },
-  {
-    path: 'callback',
-    component: CallbackComponent
   }
+
 ];
 
 @NgModule({
